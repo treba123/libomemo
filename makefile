@@ -14,14 +14,17 @@ BDIR = build
 TDIR = test
 LDIR = lib
 
+LGCRYPT_DIR=$(LDIR)/libgcrypt
+LGCRYPT_SRC=$(LGCRYPT_DIR)/src
+LGCRYPT_BUILD=$(LGCRYPT_DIR)/build
+LGCRYPT_PATH=$(LGCRYPT_BUILD)/libgcrypt.a
+
 # according to https://sourceware.org/bugzilla/show_bug.cgi?id=17879
 # -fno-builtin-memset is enough to make gcc not optimize it away
 FILES =
 
-PKGCFG_C=$(shell $(PKG_CONFIG) --cflags glib-2.0 sqlite3 mxml) \
-		 $(shell $(LIBGCRYPT_CONFIG) --cflags)
-PKGCFG_L=$(shell $(PKG_CONFIG) --libs glib-2.0 sqlite3 mxml) \
-		 $(shell $(LIBGCRYPT_CONFIG) --libs)
+PKGCFG_C=$(shell $(PKG_CONFIG) --cflags glib-2.0 sqlite3 mxml) -I$(LGCRYPT_SRC)
+PKGCFG_L=$(shell $(PKG_CONFIG) --libs glib-2.0 sqlite3 mxml)
 
 CFLAGS += -std=c11 -Wall -Wextra -Wpedantic -Wstrict-overflow \
 		-fno-strict-aliasing -funsigned-char \
@@ -63,7 +66,10 @@ $(BDIR)/libomemo_crypto.o: $(SDIR)/libomemo_crypto.c $(BDIR)
 $(BDIR)/libomemo_storage.o: $(SDIR)/libomemo_storage.c $(BDIR)
 	$(CC) -c $(SDIR)/libomemo_storage.c $(CFLAGS) $(CPPFLAGS) -fPIC -o $@
 
-$(BDIR)/libomemo-conversations.a: $(BDIR)/libomemo-conversations.o $(BDIR)/libomemo_crypto.o $(BDIR)/libomemo_storage.o
+$(LGCRYPT_PATH):
+	$(MAKE) -C "$(LGCRYPT_DIR)" build/libgcrypt.a
+
+$(BDIR)/libomemo-conversations.a: $(BDIR)/libomemo-conversations.o $(BDIR)/libomemo_crypto.o $(BDIR)/libomemo_storage.o $(LGCRYPT_PATH)
 	$(AR) rcs $@ $^
 
 .PHONY = test_libomemo.o

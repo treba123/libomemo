@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <gcrypt.h>
+#include "gcrypt.h"
 
 #include "libomemo.h"
 
