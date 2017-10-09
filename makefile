@@ -4,7 +4,7 @@ CC ?= gcc
 AR ?= ar
 LIBTOOL ?= libtool
 PKG_CONFIG ?= pkg-config
-LIBGCRYPT_CONFIG ?= libgcrypt-config
+NSS_CONFIG ?= nss-config
 MKDIR = mkdir
 MKDIR_P = mkdir -p
 
@@ -24,7 +24,7 @@ LGCRYPT_PATH=$(LGCRYPT_BUILD)/libgcrypt.a
 FILES =
 
 PKGCFG_C=$(shell $(PKG_CONFIG) --cflags glib-2.0 sqlite3 mxml) -I$(LGCRYPT_SRC)
-PKGCFG_L=$(shell $(PKG_CONFIG) --libs glib-2.0 sqlite3 mxml)
+PKGCFG_L=$(shell $(PKG_CONFIG) --libs glib-2.0 sqlite3 mxml) $(shell $(NSS_CONFIG) --libs)
 
 CFLAGS += -std=c11 -Wall -Wextra -Wpedantic -Wstrict-overflow \
 		-fno-strict-aliasing -funsigned-char \
