@@ -4,7 +4,7 @@
 #include <cmocka.h>
 
 #include "../src/libomemo.c"
-#include "../src/libomemo_crypto.c"
+#include "../src/crypto_backends/libomemo_crypto_gcrypt.c"
 
 char * devicelist = "<items node='urn:xmpp:omemo:0:devicelist'>"
                               "<item>"

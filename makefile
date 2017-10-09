@@ -10,6 +10,7 @@ MKDIR_P = mkdir -p
 
 
 SDIR = src
+BKSDIR = src/crypto_backends
 BDIR = build
 TDIR = test
 LDIR = lib
@@ -26,13 +27,18 @@ PKGCFG_L=$(shell $(PKG_CONFIG) --libs glib-2.0 sqlite3 mxml) \
 CFLAGS += -std=c11 -Wall -Wextra -Wpedantic -Wstrict-overflow \
 		-fno-strict-aliasing -funsigned-char \
 		-fno-builtin-memset $(PKGCFG_C)
-CPPFLAGS += -D_XOPEN_SOURCE=700 -D_BSD_SOURCE
+CPPFLAGS += -D_XOPEN_SOURCE=700 -D_DEFAULT_SOURCE
 CFLAGS_CONVERSATIONS=$(CFLAGS) -DOMEMO_XMLNS='"eu.siacs.conversations.axolotl"' -DOMEMO_NS_SEPARATOR='"."' -DOMEMO_NS_NOVERSION
 COVFLAGS = --coverage -O0 -g $(CFLAGS)
 LDFLAGS += -pthread -ldl -lm $(PKGCFG_L)
 TESTFLAGS = -lcmocka $(LDFLAGS)
 
+CRYPTO_BACKEND = gcrypt
+
 all: $(BDIR)/libomemo-conversations.a
+
+help:
+	echo "Set crypto backend via CRYPTO_BACKEND=(gcrypt/nss/...)"
 
 $(BDIR):
 	$(MKDIR_P) $@
@@ -45,7 +51,7 @@ libomemo-conversations: $(SDIR)/libomemo.c libomemo_crypto libomemo_storage $(BD
 	$(LIBTOOL) --mode=compile $(CC) -c $(SDIR)/libomemo.c $(CFLAGS_CONVERSATIONS) -o $(BDIR)/libomemo.lo
 	$(LIBTOOL) --mode=link $(CC) -o $(BDIR)/libomemo.la $(BDIR)/libomemo.lo $(BDIR)/libomemo_crypto.lo $(BDIR)/libomemo_storage.lo
 
-libomemo_crypto: $(SDIR)/libomemo_crypto.c build
+libomemo_crypto: $(BKSDIR)/libomemo_crypto_$(CRYPTO_BACKEND).c build
 	$(LIBTOOL) --mode=compile $(CC) -c $(SDIR)/$@.c $(CFLAGS) $(CPPFLAGS) -o $(BDIR)/$@.lo
 
 libomemo_storage: $(SDIR)/libomemo_storage.c build
@@ -57,8 +63,8 @@ $(BDIR)/libomemo.o: $(BDIR) $(SDIR)/libomemo.c $(SDIR)/libomemo.h
 $(BDIR)/libomemo-conversations.o: $(SDIR)/libomemo.c $(BDIR)
 	$(CC) -c $(SDIR)/libomemo.c $(CFLAGS_CONVERSATIONS) -fPIC -o $@
 
-$(BDIR)/libomemo_crypto.o: $(SDIR)/libomemo_crypto.c $(BDIR)
-	$(CC) -c $(SDIR)/libomemo_crypto.c $(CFLAGS) $(CPPFLAGS) -fPIC -o $@
+$(BDIR)/libomemo_crypto.o: $(BKSDIR)/libomemo_crypto_$(CRYPTO_BACKEND).c $(BDIR)
+	$(CC) -c $(BKSDIR)/libomemo_crypto_$(CRYPTO_BACKEND).c $(CFLAGS) $(CPPFLAGS) -fPIC -o $@
 
 $(BDIR)/libomemo_storage.o: $(SDIR)/libomemo_storage.c $(BDIR)
 	$(CC) -c $(SDIR)/libomemo_storage.c $(CFLAGS) $(CPPFLAGS) -fPIC -o $@

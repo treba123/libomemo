@@ -1,19 +1,18 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <gcrypt.h>
+#include <nss.h>
 
-#include "libomemo.h"
+#include "../libomemo.h"
 
 
 void omemo_default_crypto_init(void) {
-  (void) gcry_check_version((void *) 0);
+  /*(void) gcry_check_version((void *) 0);
   gcry_control(GCRYCTL_SUSPEND_SECMEM_WARN);
   gcry_control (GCRYCTL_INIT_SECMEM, 16384, 0);
   gcry_control (GCRYCTL_RESUME_SECMEM_WARN);
   gcry_control(GCRYCTL_USE_SECURE_RNDPOOL);
-  gcry_control (GCRYCTL_INITIALIZATION_FINISHED, 0);
-
+  gcry_control (GCRYCTL_INITIALIZATION_FINISHED, 0);*/
 }
 
 int omemo_default_crypto_random_bytes(uint8_t ** buf_pp, size_t buf_len, void * user_data_p) {
@@ -28,7 +27,7 @@ int omemo_default_crypto_random_bytes(uint8_t ** buf_pp, size_t buf_len, void * 
     return OMEMO_ERR_NOMEM;
   }
 
-  gcry_randomize(buf_p, buf_len, GCRY_STRONG_RANDOM);
+  //gcry_randomize(buf_p, buf_len, GCRY_STRONG_RANDOM);
 
   *buf_pp = buf_p;
 
@@ -51,6 +50,7 @@ int omemo_default_crypto_aes_gcm_encrypt( const uint8_t * plaintext_p, size_t pl
   int ret_val = 0;
   int hd_is_init = 0;
 
+  /*
   int algo = 0;
   gcry_cipher_hd_t cipher_hd;
   uint8_t * out_p = (void *) 0;
@@ -126,7 +126,7 @@ cleanup:
   if (hd_is_init) {
     gcry_cipher_close(cipher_hd);
   }
-
+  */
   return ret_val;
 }
 
@@ -145,6 +145,7 @@ int omemo_default_crypto_aes_gcm_decrypt( const uint8_t * ciphertext_p, size_t c
   int ret_val = 0;
   int hd_is_init = 0;
 
+  /*
   int algo = 0;
   gcry_cipher_hd_t cipher_hd;
   uint8_t * out_p = (void *) 0;
@@ -212,7 +213,7 @@ cleanup:
   if (hd_is_init) {
     gcry_cipher_close(cipher_hd);
   }
-
+  */
   return ret_val;
 }
 

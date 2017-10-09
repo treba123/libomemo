@@ -3,7 +3,7 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
-#include "../src/libomemo_crypto.c"
+#include "../src/crypto_backends/libomemo_crypto_gcrypt.c"
 
 int openssl_init(void ** state) {
   (void) state;
